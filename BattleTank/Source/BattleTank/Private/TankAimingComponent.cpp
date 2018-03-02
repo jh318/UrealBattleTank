@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Engine/World.h"
 #include "TankAimingComponent.h"
+#include "Engine/World.h"
+
 
 
 // Sets default values for this component's properties
@@ -14,6 +15,10 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
+void UTankAimingComponent::SetBarrelReference(UStaticMeshComponent* BarrelToSet)
+{
+	Barrel = BarrelToSet;
+}
 
 // Called when the game starts
 void UTankAimingComponent::BeginPlay()
@@ -33,8 +38,40 @@ void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	// ...
 }
 
-void UTankAimingComponent::AimAt(FVector HitLocation)
+void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
-	auto OurTankName = GetOwner()->GetName();
-	UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *OurTankName, *HitLocation.ToString());
+	if (!Barrel) { return; }
+
+	FVector OutLaunchVelocity;
+	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+
+	if (UGameplayStatics::SuggestProjectileVelocity
+		(
+			this,
+			OutLaunchVelocity,
+			StartLocation,
+			HitLocation,
+			LaunchSpeed,
+			false,
+			0,
+			0,
+			ESuggestProjVelocityTraceOption::DoNotTrace
+			)
+		)
+	{
+
+		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
+		auto TankName = GetOwner()->GetName();
+		UE_LOG(LogTemp, Warning, TEXT("%s Aiming at %s"), *TankName, *AimDirection.ToString());
+	}
+
+	
+
+	if (Barrel != nullptr) 
+	{
+		auto OurTankName = GetOwner()->GetName();
+		FString BarrelLocation = Barrel->GetComponentLocation().ToString();
+		//UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s from %s"), *OurTankName, *HitLocation.ToString(), *BarrelLocation);
+	}
+	
 }
