@@ -12,7 +12,6 @@
 void ATankPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//UE_LOG(LogTemp, Warning, TEXT("TICK"));
 	AimTowardsCrosshair();
 }
 
@@ -22,14 +21,9 @@ void ATankPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	auto AimingComponent = GetControlledTank()->FindComponentByClass<UTankAimingComponent>();
-	if (ensure(AimingComponent))
-	{
-		FoundAimingComponent(AimingComponent);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Did not find aiming component"));
-	}
+	if (!ensure(AimingComponent)) { return; }
+	FoundAimingComponent(AimingComponent);
+	
 	
 }
 
@@ -45,7 +39,6 @@ void ATankPlayerController::AimTowardsCrosshair()
 
 	FVector HitLocation;
 	if (GetSightRayHitLocation(HitLocation)) {
-		//UE_LOG(LogTemp, Warning, TEXT("HitLocation: %s"), *HitLocation.ToString());
 		GetControlledTank()->AimAt(HitLocation);
 	}
 }
@@ -55,12 +48,10 @@ bool ATankPlayerController::GetSightRayHitLocation(FVector& HitLocation) const
 	int32 ViewportSizeX, ViewportSizeY;
 	GetViewportSize(ViewportSizeX, ViewportSizeY);
 	auto ScreenLocation = FVector2D(ViewportSizeX * CrossHairXLocation, ViewportSizeY * CrossHairYLocation);
-	//UE_LOG(LogTemp, Warning, TEXT("ScreenLoc: %s"), *ScreenLocation.ToString());
 	
 	FVector LookDirection;
 	if (GetLookDirection(ScreenLocation, LookDirection))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Look Direction: %s"), *LookDirection.ToString());
 		GetLookVectorHitLocation(LookDirection, HitLocation);
 	}
 	
