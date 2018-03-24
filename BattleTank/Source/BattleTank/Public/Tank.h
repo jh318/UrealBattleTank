@@ -27,11 +27,13 @@ public:
 	FTankDelegate OnDeath;
 
 private:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	int32 StartingHealth = 100.0f;
 
 	UPROPERTY(VisibleAnywhere, Category = "Health")
-	int32 CurrentHealth = StartingHealth;
+	int32 CurrentHealth;
 
 
 };
